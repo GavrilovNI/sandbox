@@ -1,0 +1,45 @@
+Hierarchy {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .object {
+        position: relative;
+        font-size: 20px;
+        pointer-events: all;
+
+
+        &:hover {
+            backdrop-filter: contrast(0.7);
+        }
+
+        &:active {
+            backdrop-filter: contrast(0.5);
+        }
+
+        &.non-active {
+            filter: brightness(0.5);
+        }
+
+        > .toggle-icon {
+            pointer-events: none;
+        }
+
+        > .toggle-enable {
+            .checkmark {
+                border: 1px solid gray;
+            }
+        }
+
+        > .label {
+            pointer-events: none;
+        }
+
+
+        &.disabled {
+            .toggle-enable .checkmark {
+                color: transparent;
+            }
+        }
+    }
+}

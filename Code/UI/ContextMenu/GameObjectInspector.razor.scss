@@ -1,9 +1,57 @@
 
-GameObjectInspector
-{
+GameObjectInspector {
     flex-direction: column;
     overflow: hidden;
-width: 100%;
+    width: 100%;
+
+
+    > .body {
+        flex-direction: column;
+        flex-grow: 1;
+        flex-shrink: 0;
+        gap: 30px;
+
+        > .targets {
+            position: relative;
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+
+            .hierarchy {
+                position: relative;
+                width: 100%;
+                border: 2px solid gray;
+            }
+        }
+
+        > .components {
+            position: relative;
+            flex-direction: column;
+            gap: 1rem;
+
+            > .component-sheet {
+                position: relative;
+                flex-direction: column;
+                gap: 1rem;
+                border: 2px solid gray;
+
+                > .title {
+                    font-size: 30px;
+                }
+
+                controlsheet {
+                    flex-direction: column;
+                    flex-grow: 1;
+
+                    .body {
+                        flex-grow: 1;
+                        flex-direction: column;
+                        overflow: hidden;
+                    }
+                }
+            }
+        }
+    }
 }
 
 GameObjectInspector .object-info
@@ -42,24 +90,21 @@ GameObjectInspector controlsheetrow
     }
 }
 
-GameObjectInspector .material-row
-{
+GameObjectInspector .material-row {
     flex-direction: row;
     align-items: center;
     gap: 0.25rem;
     padding: 0.15rem 0;
     width: 100%;
 
-    > label
-    {
+    > label {
         flex-shrink: 0;
         font-size: 11px;
         color: rgba( white, 0.5 );
         width: 70px;
     }
 
-    .material-button
-    {
+    .material-button {
         width: 100%;
         flex-direction: row;
         align-items: center;
@@ -71,8 +116,7 @@ GameObjectInspector .material-row
         cursor: pointer;
         overflow: hidden;
 
-        label
-        {
+        label {
             font-size: 11px;
             color: rgba( white, 0.7 );
             text-overflow: ellipsis;
@@ -80,16 +124,14 @@ GameObjectInspector .material-row
             overflow: hidden;
         }
 
-        .material-group-arrow
-        {
+        .material-group-arrow {
             flex-shrink: 0;
             margin-left: auto;
             font-size: 10px;
             color: rgba( white, 0.4 );
         }
 
-        .material-preview
-        {
+        .material-preview {
             width: 20px;
             height: 20px;
             border-radius: 3px;
@@ -99,19 +141,16 @@ GameObjectInspector .material-row
             background-color: rgba( white, 0.1 );
         }
 
-        &:hover
-        {
+        &:hover {
             background-color: rgba( white, 0.1 );
 
-            label
-            {
+            label {
                 color: white;
             }
         }
     }
 
-    .material-revert
-    {
+    .material-revert {
         flex-shrink: 0;
         font-size: 11px;
         color: rgba( white, 0.3 );
@@ -119,20 +158,17 @@ GameObjectInspector .material-row
         padding: 0.15rem 0.3rem;
         border-radius: 3px;
 
-        &:hover
-        {
+        &:hover {
             color: white;
             background-color: rgba( red, 0.3 );
         }
     }
 
-    &.overridden .material-button
-    {
+    &.overridden .material-button {
         background-color: rgba( #4CAF50, 0.15 );
         border: 1px solid rgba( #4CAF50, 0.3 );
 
-        label
-        {
+        label {
             color: rgba( #4CAF50, 0.9 );
         }
     }

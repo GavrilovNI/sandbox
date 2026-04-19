@@ -1,0 +1,88 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace Sandbox
+
+
+<root class="@(Target.IsValid() ? string.Empty : "hidden")">
+	@if(!Target.IsValid())
+		return;
+	
+	@{
+		int maxLevel = int.MaxValue;
+		foreach(var (go, level) in _flatten.ToArray())
+		{
+			if(level > maxLevel)
+				continue;
+
+			maxLevel = int.MaxValue;
+			if(!_openedObjecs.GetValueOrDefault(go, false))
+				maxLevel = level;
+
+			var obj = go;
+			var classes = $"{(obj.Enabled ? "enabled" : "disabled")} {(obj.Active ? "active" : "non-active")}";
+			<div class="object @(classes) " onclick=@(() => ToggleChildren(obj)) style="left: @(level * 10)px;">
+				<i class="toggle-icon">@(IsOpened(obj) ? "arrow_drop_down" : "arrow_right")</i>
+				<Checkbox class="toggle-enable" ValueChanged=@((bool v) => { obj.Enabled = v; }) />
+				<label class="title">@go.Name</label>
+			</div>
+		}
+	}
+
+</root>
+
+@code
+{
+	[Parameter]
+	public GameObject Target
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+			_openedObjecs.Clear();
+			FlattenHierarchy();
+		}
+	}
+
+	private readonly Dictionary<GameObject, bool> _openedObjecs = [];
+
+	List<(GameObject GameObject, int Level)> _flatten = [];
+
+	private void FlattenHierarchy()
+	{
+		_flatten.Clear();
+		if(Target is not null)
+			FlattenHierarchy(Target, 0, _flatten);
+	}
+
+	private void FlattenHierarchy(GameObject gameObject, int level, List<(GameObject GameObject, int Level)> result)
+	{
+		result.Add((gameObject, level));
+
+		foreach(var child in gameObject.Children)
+			FlattenHierarchy(child, level + 1, result);
+	}
+
+	private bool IsOpened(GameObject gameObject) => _openedObjecs.GetValueOrDefault(gameObject, false);
+	private void ToggleChildren(GameObject gameObject)
+	{
+		_openedObjecs[gameObject] = !_openedObjecs.GetValueOrDefault(gameObject, false);
+		base.StateHasChanged();
+	}
+
+	public override int GetHashCode()
+	{
+		FlattenHierarchy();
+
+		var result = HashCode.Combine(_flatten.Count);
+
+		foreach(var x in _flatten)
+			result = HashCode.Combine(result, x.GameObject, x.GameObject.Active);
+
+		return result;
+	}
+}

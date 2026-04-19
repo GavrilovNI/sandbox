@@ -75,10 +75,10 @@ Inspector .tab
 Inspector .window-stack
 {
     pointer-events: all;
+    overflow-y: scroll;
 }
 
-Inspector .window-stack .window
-{
+Inspector .window-stack .window {
     background-color: $menu-panel-bg;
     backdrop-filter: blur( 8px );
     border: 1px solid $menu-surface-soft;
@@ -86,20 +86,18 @@ Inspector .window-stack .window
     width: 500px;
     border-radius: 8px;
     pointer-events: all;
+    flex-grow: 0;
+    overflow-y: scroll;
+    height: 880px;
     z-index: 200;
 
-    &.hidden
-    {
+    &.hidden {
         display: none;
     }
 }
 
-Inspector .window-stack .window .body
-{
-    flex-direction: column;
-    flex-grow: 1;
-    overflow-y: scroll;
-    gap: 2px;
+Inspector .window-stack > .window > .body {
+    
 }
 
 Inspector .window-stack .window .footer
