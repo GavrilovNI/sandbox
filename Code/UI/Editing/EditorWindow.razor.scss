@@ -1,0 +1,52 @@
+EditorWindow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+
+    &.opened {
+        pointer-events: all;
+    }
+
+    > .left {
+        position: absolute;
+        left: 0;
+        height: 100%;
+        width: 20%;
+        flex-direction: column;
+        flex-grow: 0;
+        flex-shrink: 0;
+        overflow: scroll;
+        padding: 10px;
+        padding-top: 30px;
+        backdrop-filter: blur(5);
+        border-right: 1px solid white;
+        pointer-events: all;
+
+        > .hierarchy {
+            position: relative;
+            width: 100%;
+        }
+    }
+
+    > .right {
+        position: absolute;
+        right: 0;
+        height: 100%;
+        width: 30%;
+        flex-direction: column;
+        flex-grow: 0;
+        flex-shrink: 0;
+        overflow: scroll;
+        padding: 10px;
+        padding-top: 30px;
+        backdrop-filter: blur(5);
+        border-left: 1px solid white;
+        pointer-events: all;
+
+        > .inspector {
+            position: relative;
+            width: 100%;
+        }
+    }
+}

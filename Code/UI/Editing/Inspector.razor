@@ -1,0 +1,186 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace InGameEditor
+
+
+<root class="@(Target.IsValid() ? string.Empty : "hidden")">
+	@if(!Target.IsValid())
+		return;
+	@{
+		var targetType = TypeLibrary.GetType(Target.GetType());
+		var icon = targetType?.Icon;
+	}
+	<div class="info">
+		<div class="row single">
+			<label>Use local transform</label>
+			<Checkbox Checked=@UseLocalTransform ValueChanged=@((bool v) => {UseLocalTransform = v;})></Checkbox>
+		</div>
+		<div class="row single">
+			<label>Show everything</label>
+			<Checkbox Checked=@ShowEverything ValueChanged=@((bool v) => { ShowEverything = v; })></Checkbox>
+		</div>
+		<div class="row single">
+			<i class="icon-enable @(Target.Enabled ? "enabled" : "disabled")" onclick=@(() => Target.Enabled = !Target.Enabled)>power_settings_new</i>
+			<label class="name">@Target.Name</label>
+		</div>
+		<div class="row">
+			<ControlSheet Target="@_infoProperties"></ControlSheet>
+		</div>
+	</div>
+
+	<div class="components">
+		@foreach(var (component, type, properties) in _properties)
+		{
+			if(!component.IsValid())
+			{
+				RebuildFromTarget();
+				StateHasChanged();
+				return;
+			}
+
+			var t = type;
+			var comp = component;
+			var props = properties;
+			string classes = $"{(component.Enabled ? "enabled" : "disabled")}";
+
+			<div class="component-sheet @(classes) ">
+				<div class="header @(classes) ">
+					<Checkbox class="enable" Checked=@comp.Enabled ValueChanged=@((bool v) => { comp.Enabled = v; }) />
+					<label class="title">@t.Name</label>
+				</div>
+				@if(props is not null && props.Count > 0)
+				{
+					<ControlSheet Target="@props"></ControlSheet>
+				}
+			</div>
+		}
+	</div>
+
+</root>
+
+@code
+{
+	[Parameter]
+	public GameObject? Target
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+			RebuildFromTarget();
+			StateHasChanged();
+		}
+	} = null!;
+
+	[Parameter]
+	public bool UseLocalTransform
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+			RebuildFromTarget();
+			StateHasChanged();
+		}
+	} = true;
+
+	[Parameter]
+	public bool ShowEverything
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+			RebuildFromTarget();
+			StateHasChanged();
+		}
+	} = false;
+
+	private List<(Component Component, TypeDescription Type, List<SerializedProperty> Properties)> _properties = [];
+
+	private Panel? _infoPropertiesPanel;
+
+	private List<SerializedProperty> _infoProperties = [];
+
+	private bool _buildFinished = false;
+
+
+	protected override int BuildHash() => HashCode.Combine(Target, Target?.WorldTransform, Target?.Components.Count, Target?.Enabled, Target?.Id, Target.IsValid());
+
+	void RebuildFromTarget()
+	{
+		// we need to create new here, so hashcode changes
+		_properties = [];
+		_infoProperties = [];
+
+		if(!Target.IsValid())
+			return;
+
+		var serializedObject = TypeLibrary.GetSerializedObject(Target);
+		if(serializedObject is not null)
+		{
+			var nameProperty = serializedObject.GetProperty("Name");
+			var flagsProperty = serializedObject.GetProperty("Flags");
+			var networkModeProperty = serializedObject.GetProperty("NetworkMode");
+			var tagsProperty = serializedObject.GetProperty("Tags");
+			var transformProperty = serializedObject.GetProperty(UseLocalTransform ? "LocalTransform" : "WorldTransform");
+
+			if(nameProperty is not null)
+				_infoProperties.Add(nameProperty);
+			if(flagsProperty is not null)
+				_infoProperties.Add(flagsProperty);
+			if(tagsProperty is not null)
+				_infoProperties.Add(tagsProperty);
+			if(networkModeProperty is not null)
+				_infoProperties.Add(networkModeProperty);
+			if(transformProperty is not null)
+				_infoProperties.Add(transformProperty);
+		}
+
+		CollectProperties(Target.Components.GetAll().ToArray());
+	}
+
+	private void CollectProperties(Component[] components)
+	{
+		foreach(var component in components)
+		{
+			var type = TypeLibrary.GetType(component.GetType());
+			var so = TypeLibrary.GetSerializedObject(component);
+			so.OnPropertyChanged = OnPropertyChanged;
+
+			List<SerializedProperty> properties = [];
+
+			foreach(var prop in so)
+			{
+				if(prop is null)
+					continue;
+
+				if(!ShowEverything && !(prop.HasAttribute<PropertyAttribute>() || prop.HasAttribute<ButtonAttribute>()))
+					continue;
+
+				properties.Add(prop);
+			}
+
+			_properties.Add((component, type, properties));
+		}
+	}
+
+	private void OnPropertyChanged(SerializedProperty prop)
+	{
+		foreach(var c in prop.Parent.Targets)
+		{
+			if(c is Component component)
+				GameManager.ChangeProperty(component, prop.Name, prop.GetValue<object>());
+		}
+	}
+}

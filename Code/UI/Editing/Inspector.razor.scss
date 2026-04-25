@@ -1,0 +1,114 @@
+Inspector {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    pointer-events: all;
+    overflow: scroll;
+    flex-grow: 0;
+    flex-shrink: 0;
+    color: white;
+
+    controlsheet {
+        position: relative;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .body {
+            flex-shrink: 0;
+            flex-grow: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        controlsheetrow {
+            flex-direction: row;
+            max-height: 1000000px;
+            width: 100%;
+        }
+    }
+
+    checkbox {
+        border: 1px solid white;
+
+        &:not(.checked) {
+            .checkmark {
+                opacity: 0;
+            }
+        }
+    }
+
+    > .info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex-shrink: 0;
+        flex-grow: 1;
+
+        > .row {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+            flex-shrink: 0;
+            flex-grow: 0;
+            height: auto;
+
+            > .name {
+                font-size: 40px;
+            }
+
+            &.single {
+                max-height: 40px;
+            }
+
+            i {
+                border-radius: 5px;
+            }
+
+            > .icon-enable {
+                position: relative;
+                height: 100%;
+                aspect-ratio: 1;
+                font-size: 41px;
+                align-items: center;
+                text-align: center;
+                color: #0f0f;
+
+                &.enabled {
+                    border: 1px solid lightgreen;
+                    background-color: #0705;
+                }
+
+                &.disabled {
+                    color: #0f09;
+                }
+            }
+        }
+    }
+
+    > .components {
+        position: relative;
+        flex-direction: column;
+        gap: 1rem;
+
+        > .component-sheet {
+            position: relative;
+            flex-direction: column;
+            border: 2px solid #aaaf;
+
+            > .header {
+                padding: 10px;
+                font-size: 30px;
+                gap: 5px;
+                background-color: #444f;
+
+                &.disabled {
+                    filter: brightness(0.6);
+                }
+            }
+
+            > controlsheet {
+                background-color: #3339;
+            }
+        }
+    }
+}

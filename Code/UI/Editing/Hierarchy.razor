@@ -1,0 +1,246 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace InGameEditor
+
+
+<root class="@(Target.IsValid() ? string.Empty : "hidden")">
+	@if(!Target.IsValid())
+		return;
+
+	@{
+		int maxLevel = int.MaxValue;
+		foreach(var (go, level) in _flatten.ToArray())
+		{
+			if(level > maxLevel)
+				continue;
+
+			maxLevel = int.MaxValue;
+			if(!_openedObjecs.GetValueOrDefault(go, false))
+				maxLevel = level;
+
+
+			var (icon, iconColor, textColor, extraInfo) = GetGameObjectStyle(go);
+
+			bool selected = go == SelectedObject;
+			bool hasChildren = go.Children.Count > 0;
+			var classes = $"{(go.Enabled ? "enabled" : "disabled")} {(go.Active ? "active" : "non-active")} {(hasChildren ? "has-children" : "no-children")} {(selected ? "selected" : string.Empty)}";
+
+			var obj = go;
+			<div class="object @(classes) " style="left: @(level * 10)px;" onclick=@(() => SelectedObject = obj)>
+				<i class="toggle-icon" onclick=@(() => ToggleChildren(obj))>@(IsOpened(obj) ? "arrow_drop_down" : "arrow_right")</i>
+				<i class="icon" style="color:@(iconColor.Hex);">@icon</i>
+				<label class="title" style="color:@(textColor.Hex);">@go.Name</label>
+				<label class="title" style="color:@(textColor.Invert().Hex);">@extraInfo</label>
+			</div>
+		}
+	}
+
+</root>
+
+@code
+{
+	[Parameter]
+	public GameObject Target
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+			_openedObjecs.Clear();
+			FlattenHierarchy();
+			StateHasChanged();
+		}
+	}
+
+	[Parameter]
+	public Action<GameObject>? Selected;
+	[Parameter]
+	private float UpdatedTime = 0.5f;
+
+	[Parameter]
+	public GameObject? SelectedObject
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+
+			var current = value;
+			while(current.IsValid())
+			{
+				_openedObjecs[current] = true;
+				current = current.Parent;
+			}
+
+			Selected?.Invoke(value);
+			StateHasChanged();
+		}
+	}
+
+	private readonly Dictionary<GameObject, bool> _openedObjecs = [];
+
+	private List<(GameObject GameObject, int Level)> _flatten = [];
+
+	private void FlattenHierarchy()
+	{
+		_flatten.Clear();
+		if(Target is not null)
+			FlattenHierarchy(Target, 0, _flatten);
+	}
+
+	private void FlattenHierarchy(GameObject gameObject, int level, List<(GameObject GameObject, int Level)> result)
+	{
+		result.Add((gameObject, level));
+
+		foreach(var child in gameObject.Children)
+			FlattenHierarchy(child, level + 1, result);
+	}
+
+	private bool IsOpened(GameObject gameObject) => _openedObjecs.GetValueOrDefault(gameObject, false);
+	private void ToggleChildren(GameObject gameObject)
+	{
+		var newValue = gameObject.Children.Count == 0 ? false : !_openedObjecs.GetValueOrDefault(gameObject, false);
+		_openedObjecs[gameObject] = newValue;
+		base.StateHasChanged();
+	}
+
+	private TimeSince _timeSinceUpdatedHashCode = float.MaxValue;
+	private int oldHashCode = 0;
+
+	public override int GetHashCode()
+	{
+		if(_timeSinceUpdatedHashCode < UpdatedTime)
+			return oldHashCode;
+
+		FlattenHierarchy();
+
+		var result = HashCode.Combine(_flatten.Count);
+
+		foreach(var x in _flatten)
+			result = HashCode.Combine(result, x.GameObject, x.GameObject?.Active);
+
+		oldHashCode = result;
+		return result;
+	}
+
+	private (string Icon, Color Color, Color TextColor, string ExtraInfo) GetGameObjectStyle(GameObject go)
+	{
+		var isBone = go.Flags.Contains(GameObjectFlags.Bone);
+		var isProceduralBone = go.Flags.Contains(GameObjectFlags.ProceduralBone);
+		var isAttachment = go.Flags.Contains(GameObjectFlags.Attachment);
+		var isNetworked = go.Scene.IsEditor ? go.NetworkMode == NetworkMode.Object : go.Network.Active;
+		var isNetworkRoot = isNetworked && (go.Scene.IsEditor ? go.NetworkMode == NetworkMode.Object : go.IsNetworkRoot);
+
+		bool isErrored = go.Flags.Contains(GameObjectFlags.Error);
+		bool isLoading = go.Flags.Contains(GameObjectFlags.Loading);
+		bool isTemporary = go.Flags.Contains(GameObjectFlags.NotSaved);
+		bool isEditorOnly = go.Flags.Contains(GameObjectFlags.EditorOnly);
+
+		float opacity = 0.9f;
+
+		if(!go.Active)
+			opacity *= 0.5f;
+
+		Color pink = Color.Parse("#DF9194").Value;
+
+		Color pen = Color.White;
+		string icon = "layers";
+		Color iconColor = Color.White.WithAlpha(0.6f);
+
+		string extraInfo = string.Empty;
+
+		if(go.IsPrefabInstance)
+		{
+			pen = Color.Blue;
+
+			if(go.IsPrefabInstanceRoot)
+			{
+				icon = "dataset";
+				iconColor = Color.Blue;
+			}
+		}
+
+		if(isBone)
+		{
+			icon = "polyline";
+			iconColor = pink.WithAlpha(0.8f);
+
+			if(isProceduralBone)
+			{
+				iconColor = Color.Blue.WithAlpha(0.8f);
+			}
+		}
+
+		if(isAttachment)
+		{
+			icon = "push_pin";
+			iconColor = pink.WithAlpha(0.8f);
+
+			if(isProceduralBone)
+			{
+				iconColor = Color.Blue.WithAlpha(0.8f);
+			}
+		}
+
+		if(isTemporary)
+		{
+			iconColor = Color.White.WithAlpha(0.5f);
+			pen = iconColor.Lighten(0.2f).WithAlpha(0.8f);
+			icon = "no_sim";
+		}
+
+		if(isNetworked)
+		{
+			icon = "rss_feed";
+			iconColor = Color.Blue.WithAlpha(0.8f);
+
+			if(go.Network.IsOwner)
+			{
+				iconColor = Color.Green.WithAlpha(0.8f);
+			}
+
+			if(go.IsProxy)
+			{
+				iconColor = Color.White.WithAlpha(0.6f);
+			}
+
+			if(!isNetworkRoot)
+				iconColor = iconColor.WithAlphaMultiplied(0.4f);
+		}
+
+		if(isErrored)
+		{
+			icon = "report";
+			iconColor = Color.Red.WithAlpha(0.8f);
+		}
+
+		if(isEditorOnly)
+		{
+			icon = "highlight_alt";
+			iconColor = Color.Yellow.WithAlpha(0.8f);
+			pen = Color.Yellow.WithAlpha(0.6f);
+		}
+
+		if(isNetworkRoot && go.Network.OwnerId != Guid.Empty)
+		{
+			var connection = Connection.Find(go.Network.OwnerId);
+			if(connection is null)
+			{
+				extraInfo = $"Unknown Owner - {go.Network.OwnerId}";
+			}
+			else
+			{
+				extraInfo = $"{connection.DisplayName}";
+			}
+		}
+
+		return (icon, iconColor, pen, extraInfo);
+	}
+}

@@ -1,0 +1,75 @@
+Hierarchy {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    pointer-events: all;
+    overflow: scroll;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    .object {
+        position: relative;
+        font-size: 20px;
+        pointer-events: all;
+        border: 0.5px solid gray;
+        flex-grow: 0;
+        flex-shrink: 0;
+        background-color: #3336;
+
+        &:hover {
+            background-color: #3339;
+        }
+
+        &:active {
+            background-color: #333b;
+        }
+
+        &.selected {
+            background-color: #3836;
+
+            &:hover {
+                background-color: #3839;
+            }
+
+            &:active {
+                background-color: #383b;
+            }
+        }
+
+        &.non-active {
+            background-color: #3333;
+
+            > .label {
+                opacity: 0.5;
+                filter: grayscale(0.1);
+            }
+        }
+
+        > .toggle-enable {
+            .checkmark {
+                border: 1px solid gray;
+            }
+        }
+
+        > .label {
+            pointer-events: none;
+        }
+
+
+        &.disabled {
+            .toggle-enable .checkmark {
+                color: transparent;
+            }
+        }
+
+        > .toggle-icon {
+            pointer-events: all;
+        }
+
+        &.no-children {
+            > .toggle-icon {
+                opacity: 0;
+            }
+        }
+    }
+}

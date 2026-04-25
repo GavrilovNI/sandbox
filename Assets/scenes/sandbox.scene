@@ -20,7 +20,7 @@
         {
           "__type": "Sandbox.MapInstance",
           "__guid": "50042ecd-9dd2-457a-837c-0cda534d9eb8",
-          "__enabled": true,
+          "__enabled": false,
           "Flags": 0,
           "__version": 1,
           "EnableCollision": true,
@@ -35,6 +35,56 @@
           "OnMapLoaded": null,
           "OnMapUnloaded": null,
           "UseMapFromLaunch": true
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "ca092648-c3f0-44ba-81be-688b964bd1d5",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Editor",
+      "Position": "149.994965,149.994995,-212.124985",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ScreenPanel",
+          "__guid": "bc5c9187-f0c3-490a-9acd-9ae8860b9130",
+          "__enabled": true,
+          "Flags": 0,
+          "AutoScreenScale": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Opacity": 1,
+          "Scale": 1,
+          "ScaleStrategy": "ConsistentHeight",
+          "TargetCamera": null,
+          "ZIndex": 1000
+        },
+        {
+          "__type": "InGameEditor.EditorWindow",
+          "__guid": "add2710e-bb03-4329-96ab-80bd409b0e29",
+          "__enabled": true,
+          "Flags": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Opened": false
         }
       ],
       "Children": []
@@ -55,7 +105,19 @@
       "AgentStepSize": 18,
       "AgentMaxSlope": 40,
       "ExcludedBodies": "",
-      "IncludedBodies": ""
+      "IncludedBodies": "",
+      "DeferGeneration": false,
+      "CustomBounds": false
+    },
+    "GameObjectSystems": {
+      "Sandbox.Clutter.ClutterGridSystem": {
+        "Storage": {
+          "$blob": "9e347c91-96b5-4374-98cd-b5c25bbe7ff9"
+        }
+      },
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      }
     }
   },
   "ResourceVersion": 3,

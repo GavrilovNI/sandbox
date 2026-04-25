@@ -1,0 +1,96 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+
+@inherits PanelComponent
+@namespace InGameEditor
+
+<root class="@(Opened ? "opened" : "closed")">
+
+	@if(!Opened)
+		return;
+
+	<div class="left">
+		<Hierarchy class="hierarchy" Target=@Scene @ref="_hierarchy" Selected=@((GameObject go) => {Selected = go;}) />
+	</div>
+	<div class="right">
+		<Inspector class="inspector" Target:bind=@Selected @ref="_inspector"/>
+	</div>
+</root>
+
+@code {
+
+
+	[Property]
+	public bool Opened { get; set; } = false;
+
+	[Property]
+	public GameObject? Selected
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			_hightlight?.Targets?.Clear();
+
+			field = value;
+			_hierarchy?.SelectedObject = value;
+			_inspector?.Target = value;
+
+			if(value is not null)
+			{
+				_hightlight ??= AddComponent<HighlightOutline>(true);
+				_hightlight.Flags |= ComponentFlags.NotNetworked;
+
+				_hightlight.OverrideTargets = true;
+				_hightlight.Targets ??= [];
+				_hightlight.Targets.AddRange(value.Components.GetAll<Renderer>());
+			}
+		}
+	} = null!;
+
+
+	private Hierarchy? _hierarchy;
+	private Inspector? _inspector;
+
+	private HighlightOutline? _hightlight;
+
+	protected override async Task OnLoad()
+	{
+		GameObject.NetworkMode = NetworkMode.Never;
+	}
+
+	protected override void OnUpdate()
+	{
+		if(Input.Keyboard.Pressed("INS"))
+			Opened = !Opened;
+	}
+
+	private void SelectObjectFromRay()
+	{
+		var cursorPos = Mouse.Position;
+		var screenRay = Scene.Camera.ScreenPixelToRay( cursorPos );
+		var tr = Scene.Trace.Ray(screenRay, 1000000 )
+							.RunAll().FirstOrDefault(x => !x.StartedSolid && x.Distance > 0);
+
+		var go = tr.Collider?.GameObject ?? tr.GameObject;
+		go = go?.FindNetworkRoot() ?? go;
+
+		if(go.IsValid())
+			Selected = go;
+	}
+
+	protected override void OnMouseUp(MousePanelEvent e)
+	{
+		if(e.Target == Panel && Opened)
+		{
+			SelectObjectFromRay();
+			e.StopPropagation();
+		}
+
+		base.OnMouseUp(e);
+	}
+
+	protected override int BuildHash() => HashCode.Combine(Opened, Scene);
+}

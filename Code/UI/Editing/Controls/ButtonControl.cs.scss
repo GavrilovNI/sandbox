@@ -1,0 +1,21 @@
+ButtonControl {
+    gap: 2px;
+    flex-grow: 1;
+
+    .button {
+        border: 1px solid #224f;
+        padding: 5px;
+        align-items: center;
+        border-radius: 10px;
+        pointer-events: all;
+        background-color: #4457;
+
+        &:hover {
+            background-color: #6677;
+        }
+
+        &:active {
+            background-color: #8897;
+        }
+    }
+}
