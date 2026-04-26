@@ -93,4 +93,23 @@
 	}
 
 	protected override int BuildHash() => HashCode.Combine(Opened, Scene);
+
+	[ConCmd("ingameeditor")]
+	public static void ToggleEditor()
+	{
+		var editor = Game.ActiveScene.Components.Get<EditorWindow>(FindMode.EverythingInSelfAndDescendants);
+		if(!editor.IsValid())
+		{
+			var go  =new GameObject();
+			go.AddComponent<ScreenPanel>();
+			editor = go.AddComponent<EditorWindow>();
+			editor.Opened = true;
+			return;
+		}
+
+		editor.GameObject.Enabled = true;
+		editor.GetOrAddComponent<ScreenPanel>().Enabled = true;
+		editor.Enabled = true;
+		editor.Opened = !editor.Opened;
+	}
 }
