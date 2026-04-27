@@ -20,7 +20,7 @@
         {
           "__type": "Sandbox.MapInstance",
           "__guid": "50042ecd-9dd2-457a-837c-0cda534d9eb8",
-          "__enabled": false,
+          "__enabled": true,
           "Flags": 0,
           "__version": 1,
           "EnableCollision": true,
@@ -49,7 +49,7 @@
       "Scale": "1,1,1",
       "Tags": "",
       "Enabled": true,
-      "NetworkMode": 2,
+      "NetworkMode": 0,
       "NetworkFlags": 0,
       "NetworkOrphaned": 0,
       "NetworkTransmit": true,
@@ -84,7 +84,8 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "Opened": false
+          "Opened": false,
+          "Selected": null
         }
       ],
       "Children": []
@@ -110,13 +111,13 @@
       "CustomBounds": false
     },
     "GameObjectSystems": {
+      "Sandbox.MovieMaker.MovieRecorderSystem": {
+        "DisableClientRecording": false
+      },
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
           "$blob": "9e347c91-96b5-4374-98cd-b5c25bbe7ff9"
         }
-      },
-      "Sandbox.MovieMaker.MovieRecorderSystem": {
-        "DisableClientRecording": false
       }
     }
   },
