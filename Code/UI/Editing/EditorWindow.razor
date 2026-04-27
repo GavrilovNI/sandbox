@@ -78,10 +78,14 @@
 		go = go?.FindNetworkRoot() ?? go;
 
 		if(!go.IsValid())
-			return;
-
-		if(go.Components.Get<MapCollider>(FindMode.EverythingInSelf).IsValid())
-			return;
+		{
+			go = null;
+		}
+		else
+		{
+			if(go.Components.Get<MapCollider>(FindMode.EverythingInSelf).IsValid())
+				go = null;
+		}
 
 		Selected = go;
 	}
