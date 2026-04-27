@@ -1,0 +1,22 @@
+ConnectionControl {
+    gap: 2px;
+    flex-grow: 1;
+
+    .dropdown {
+        .button-right-column {
+            padding: 5px;
+        }
+
+        .label {
+            align-self: center;
+        }
+    }
+}
+
+ConnectionControl DropDown {
+    border-radius: 8px;
+    background-color: #000a;
+    flex-grow: 1;
+    flex-grow: 1;
+    min-height: 32px;
+}

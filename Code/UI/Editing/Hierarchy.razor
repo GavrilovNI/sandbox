@@ -10,8 +10,11 @@
 
 	@{
 		int maxLevel = int.MaxValue;
-		foreach(var (go, level) in _flatten.ToArray())
+		foreach(var (gox, levelx) in _flatten.ToArray())
 		{
+			var go = gox;
+			var level = levelx;
+
 			if(level > maxLevel)
 				continue;
 
@@ -31,7 +34,7 @@
 				<i class="toggle-icon" onclick=@(() => ToggleChildren(obj))>@(IsOpened(obj) ? "arrow_drop_down" : "arrow_right")</i>
 				<i class="icon" style="color:@(iconColor.Hex);">@icon</i>
 				<label class="title" style="color:@(textColor.Hex);">@go.Name</label>
-				<label class="title" style="color:@(textColor.Invert().Hex);">@extraInfo</label>
+				<label class="title" style="color:@(Color.Yellow.Hex);">@extraInfo</label>
 			</div>
 		}
 	}
@@ -124,7 +127,7 @@
 		var result = HashCode.Combine(_flatten.Count);
 
 		foreach(var x in _flatten)
-			result = HashCode.Combine(result, x.GameObject, x.GameObject?.Active);
+			result = HashCode.Combine(result, x.GameObject, x.GameObject?.Active, x.GameObject.NetworkMode, x.GameObject.Network?.OwnerId);
 
 		oldHashCode = result;
 		return result;

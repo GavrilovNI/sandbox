@@ -145,6 +145,18 @@
 				_infoProperties.Add(networkModeProperty);
 			if(transformProperty is not null)
 				_infoProperties.Add(transformProperty);
+
+			if(Target.Network is not null)
+			{
+				var ownerProperty = TypeLibrary.CreateProperty("Owner", () => Target.Network.Owner, o =>
+				{
+					if(o is null)
+						Target.Network.DropOwnership();
+					else
+						Target.Network.AssignOwnership(o);
+				}, null);
+				_infoProperties.Add(ownerProperty);
+			}
 		}
 
 		CollectProperties(Target.Components.GetAll().ToArray());
