@@ -77,8 +77,13 @@
 		var go = tr.Collider?.GameObject ?? tr.GameObject;
 		go = go?.FindNetworkRoot() ?? go;
 
-		if(go.IsValid())
-			Selected = go;
+		if(!go.IsValid())
+			return;
+
+		if(go.Components.Get<MapCollider>(FindMode.EverythingInSelf).IsValid())
+			return;
+
+		Selected = go;
 	}
 
 	protected override void OnMouseUp(MousePanelEvent e)
