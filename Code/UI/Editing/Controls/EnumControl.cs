@@ -171,7 +171,7 @@ public class EnumControl : BaseControl
 
 
 
-			return _flags ? _value.HasFlag( (Enum)value ) : _value.Equals( value );
+			return _flags ? (_value?.HasFlag( (Enum)value ) ?? false) : (_value?.Equals( value ) ?? false);
 		}
 
 		private void Select( Option option )
