@@ -21,6 +21,10 @@
 			<Checkbox Checked=@ShowEverything ValueChanged=@((bool v) => { ShowEverything = v; })></Checkbox>
 		</div>
 		<div class="row single">
+			<label>Hide actions</label>
+			<Checkbox Checked=@HideActions ValueChanged=@((bool v) => { HideActions = v; })></Checkbox>
+		</div>
+		<div class="row single">
 			<i class="icon-enable @(Target.Enabled ? "enabled" : "disabled")" onclick=@(() => Target.Enabled = !Target.Enabled)>power_settings_new</i>
 			<label class="name">@Target.Name</label>
 		</div>
@@ -106,6 +110,21 @@
 		}
 	} = false;
 
+	[Parameter]
+	public bool HideActions
+	{
+		get;
+		set
+		{
+			if(field == value)
+				return;
+
+			field = value;
+			RebuildFromTarget();
+			StateHasChanged();
+		}
+	} = true;
+
 	private List<(Component Component, TypeDescription Type, List<SerializedProperty> Properties)> _properties = [];
 
 	private Panel? _infoPropertiesPanel;
@@ -178,6 +197,9 @@
 					continue;
 
 				if(!ShowEverything && !(prop.HasAttribute<PropertyAttribute>() || prop.HasAttribute<ButtonAttribute>()))
+					continue;
+
+				if(HideActions && prop.PropertyType.FullName is not null && prop.PropertyType.FullName.StartsWith("System.Action"))
 					continue;
 
 				properties.Add(prop);
